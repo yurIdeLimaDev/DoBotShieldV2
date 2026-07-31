@@ -1,0 +1,27 @@
+# Compiled binaries
+dobotshield
+dobotshield.exe
+build/
+dist/
+
+# Locally generated TLS material
+*.crt
+*.key
+*.pem
+
+# Local environment files
+.env
+*.env
+
+# Tool caches and runtime state
+.gocache/
+.cache/
+state/
+ratelimit.json
+
+# Training Mode runtime artifacts
+logs/
+training-report.html
+
+# Local security tools
+tools/

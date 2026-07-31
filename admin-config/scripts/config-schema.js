@@ -1,0 +1,102 @@
+(function attachConfigSchema(global) {
+  "use strict";
+
+  var DEFAULT_CONFIG = {
+    targetUrl: "http://localhost:4280",
+    proxyPort: ":443",
+    httpMode: "false",
+    preserveHost: "false",
+    allowedHosts: "",
+    allowedMethods: "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS",
+    enableWaf: "true",
+    wafMode: "block",
+    enableResponseInspection: "true",
+    enableResponseXss: "false",
+    responseDiagnosticsErrorsOnly: "true",
+  customRulesFile: "",
+  enableWebSocketProtection: "true",
+  webSocketAllowedOrigins: "",
+  webSocketMaxMessageSize: "1048576",
+  webSocketMessagesPerSecond: "50",
+  webSocketBurstLimit: "100",
+  webSocketInspectBinary: "false",
+    enableRateLimit: "true",
+    rateLimit: "10.0",
+    burstLimit: "20",
+    maxConns: "10",
+    maxTrackedIps: "10000",
+    maxConcurrentRequests: "1000",
+    maxBodySize: "1048576",
+    maxDecodedBodySize: "4194304",
+    responseInspectionLimit: "1048576",
+    maxUrlLength: "8192",
+    maxHeaderBytes: "65536",
+    maxHeaderCount: "100",
+    certFile: "server.crt",
+    keyFile: "server.key",
+    trustedProxies: "127.0.0.1,::1",
+    insecureSkipVerify: "false",
+    contentSecurityPolicy: "",
+    hardenCookies: "false",
+    wafAllowlist: "",
+    blockedIps: "",
+    rateLimitStateFile: "",
+    enableTraining: "false",
+    trainingLogFile: "logs/training.jsonl",
+    trainingRedactSensitive: "true"
+  };
+
+  var CONFIG_FIELDS = [
+    { id: "targetUrl", env: "TARGET_URL", defaultValue: DEFAULT_CONFIG.targetUrl },
+    { id: "proxyPort", env: "PROXY_PORT", defaultValue: DEFAULT_CONFIG.proxyPort },
+    { id: "httpMode", env: "HTTP_MODE", defaultValue: DEFAULT_CONFIG.httpMode },
+    { id: "preserveHost", env: "PRESERVE_HOST", defaultValue: DEFAULT_CONFIG.preserveHost },
+    { id: "allowedHosts", env: "ALLOWED_HOSTS", defaultValue: DEFAULT_CONFIG.allowedHosts },
+    { id: "allowedMethods", env: "ALLOWED_METHODS", defaultValue: DEFAULT_CONFIG.allowedMethods },
+    { id: "enableWaf", env: "ENABLE_WAF", defaultValue: DEFAULT_CONFIG.enableWaf },
+    { id: "wafMode", env: "WAF_MODE", defaultValue: DEFAULT_CONFIG.wafMode },
+    { id: "enableResponseInspection", env: "ENABLE_RESPONSE_INSPECTION", defaultValue: DEFAULT_CONFIG.enableResponseInspection },
+    { id: "enableResponseXss", env: "ENABLE_RESPONSE_XSS", defaultValue: DEFAULT_CONFIG.enableResponseXss },
+    { id: "responseDiagnosticsErrorsOnly", env: "RESPONSE_DIAGNOSTICS_ERRORS_ONLY", defaultValue: DEFAULT_CONFIG.responseDiagnosticsErrorsOnly },
+  { id: "customRulesFile", env: "CUSTOM_RULES_FILE", defaultValue: DEFAULT_CONFIG.customRulesFile },
+  { id: "enableWebSocketProtection", env: "ENABLE_WEBSOCKET_PROTECTION", defaultValue: DEFAULT_CONFIG.enableWebSocketProtection },
+  { id: "webSocketAllowedOrigins", env: "WEBSOCKET_ALLOWED_ORIGINS", defaultValue: DEFAULT_CONFIG.webSocketAllowedOrigins },
+  { id: "webSocketMaxMessageSize", env: "WEBSOCKET_MAX_MESSAGE_SIZE", defaultValue: DEFAULT_CONFIG.webSocketMaxMessageSize, min: 1024, max: 16777216 },
+  { id: "webSocketMessagesPerSecond", env: "WEBSOCKET_MESSAGES_PER_SECOND", defaultValue: DEFAULT_CONFIG.webSocketMessagesPerSecond, min: 0.1, max: 100000 },
+  { id: "webSocketBurstLimit", env: "WEBSOCKET_BURST_LIMIT", defaultValue: DEFAULT_CONFIG.webSocketBurstLimit, min: 1, max: 100000 },
+  { id: "webSocketInspectBinary", env: "WEBSOCKET_INSPECT_BINARY", defaultValue: DEFAULT_CONFIG.webSocketInspectBinary },
+    { id: "enableRateLimit", env: "ENABLE_RATE_LIMIT", defaultValue: DEFAULT_CONFIG.enableRateLimit },
+    { id: "rateLimit", env: "RATE_LIMIT", defaultValue: DEFAULT_CONFIG.rateLimit, min: 0.1 },
+    { id: "burstLimit", env: "BURST_LIMIT", defaultValue: DEFAULT_CONFIG.burstLimit, min: 1 },
+    { id: "maxConns", env: "MAX_CONNS", defaultValue: DEFAULT_CONFIG.maxConns, min: 1 },
+    { id: "maxTrackedIps", env: "MAX_TRACKED_IPS", defaultValue: DEFAULT_CONFIG.maxTrackedIps, min: 1 },
+    { id: "maxConcurrentRequests", env: "MAX_CONCURRENT_REQUESTS", defaultValue: DEFAULT_CONFIG.maxConcurrentRequests, min: 1 },
+    { id: "maxBodySize", env: "MAX_BODY_SIZE", defaultValue: DEFAULT_CONFIG.maxBodySize, min: 1024 },
+    { id: "maxDecodedBodySize", env: "MAX_DECODED_BODY_SIZE", defaultValue: DEFAULT_CONFIG.maxDecodedBodySize, min: 1024 },
+    { id: "responseInspectionLimit", env: "RESPONSE_INSPECTION_LIMIT", defaultValue: DEFAULT_CONFIG.responseInspectionLimit, min: 1024 },
+    { id: "maxUrlLength", env: "MAX_URL_LENGTH", defaultValue: DEFAULT_CONFIG.maxUrlLength, min: 256 },
+    { id: "maxHeaderBytes", env: "MAX_HEADER_BYTES", defaultValue: DEFAULT_CONFIG.maxHeaderBytes, min: 1024 },
+    { id: "maxHeaderCount", env: "MAX_HEADER_COUNT", defaultValue: DEFAULT_CONFIG.maxHeaderCount, min: 1 },
+    { id: "certFile", env: "CERT_FILE", defaultValue: DEFAULT_CONFIG.certFile },
+    { id: "keyFile", env: "KEY_FILE", defaultValue: DEFAULT_CONFIG.keyFile },
+    { id: "trustedProxies", env: "TRUSTED_PROXIES", defaultValue: DEFAULT_CONFIG.trustedProxies },
+    { id: "insecureSkipVerify", env: "INSECURE_SKIP_VERIFY", defaultValue: DEFAULT_CONFIG.insecureSkipVerify },
+    { id: "contentSecurityPolicy", env: "CONTENT_SECURITY_POLICY", defaultValue: DEFAULT_CONFIG.contentSecurityPolicy },
+    { id: "hardenCookies", env: "HARDEN_COOKIES", defaultValue: DEFAULT_CONFIG.hardenCookies },
+    { id: "wafAllowlist", env: "WAF_ALLOWLIST", defaultValue: DEFAULT_CONFIG.wafAllowlist },
+    { id: "blockedIps", env: "BLOCKED_IPS", defaultValue: DEFAULT_CONFIG.blockedIps },
+    { id: "rateLimitStateFile", env: "RATE_LIMIT_STATE_FILE", defaultValue: DEFAULT_CONFIG.rateLimitStateFile },
+    { id: "enableTraining", env: "TRAINING_MODE", defaultValue: DEFAULT_CONFIG.enableTraining },
+    { id: "trainingLogFile", env: "TRAINING_LOG_FILE", defaultValue: DEFAULT_CONFIG.trainingLogFile },
+    { id: "trainingRedactSensitive", env: "TRAINING_REDACT_SENSITIVE", defaultValue: DEFAULT_CONFIG.trainingRedactSensitive }
+  ];
+
+  function getDefaultConfig() {
+    return Object.assign({}, DEFAULT_CONFIG);
+  }
+
+  global.DoBotAdmin = Object.assign(global.DoBotAdmin || {}, {
+    CONFIG_FIELDS: CONFIG_FIELDS,
+    getDefaultConfig: getDefaultConfig
+  });
+})(window);

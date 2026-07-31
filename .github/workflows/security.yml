@@ -1,0 +1,99 @@
+name: Continuous security verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Unit, vet, static analysis, vulnerabilities
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: "1.26.x"
+          cache: true
+      - run: go test ./...
+      - run: go vet ./...
+      - run: go run honnef.co/go/tools/cmd/staticcheck@v0.7.0 ./...
+      - run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
+
+  race:
+    name: Go data-race detector
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CGO_ENABLED: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: "1.26.x"
+          cache: true
+      - run: go test -race ./...
+
+  fuzz:
+    name: Bounded continuous fuzzing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: "1.26.x"
+          cache: true
+      - run: go test ./waf -run=^$ -fuzz=FuzzBuildVariants -fuzztime=30s
+      - run: go test ./waf -run=^$ -fuzz=FuzzCheckRequest -fuzztime=30s
+      - run: go test ./waf -run=^$ -fuzz=FuzzDecodeBodyForInspection -fuzztime=30s
+      - run: go test ./waf -run=^$ -fuzz=FuzzStructuredRequestBodies -fuzztime=30s
+
+  crs-differential:
+    name: OWASP CRS 4.25 LTS differential corpus
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      backend:
+        image: nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+      crs:
+        image: owasp/modsecurity-crs:4.25.1-nginx-lts@sha256:a7d2e948d26ec310a127b261e4b9010ff2467b9f5f7eaed4921450bb7865ba08
+        ports:
+          - 8080:8080
+        env:
+          BACKEND: http://backend:80
+          PARANOIA: "1"
+          BLOCKING_PARANOIA: "1"
+          INBOUND_ANOMALY_SCORE_THRESHOLD: "5"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: "1.26.x"
+          cache: true
+      - name: Wait for the official CRS container
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:8080/healthz >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs "${{ job.services.crs.id }}"
+          exit 1
+      - name: Compare the high-confidence corpus
+        env:
+          CRS_URL: http://127.0.0.1:8080
+        run: go test ./waf -run '^TestDifferentialAgainstOWASPCRS$' -count=1 -v

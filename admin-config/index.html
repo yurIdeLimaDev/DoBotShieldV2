@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DoBot Shield | Configuration</title>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <header class="app-header">
+    <div><p class="eyebrow">DoBot Shield</p><h1>Administrative configuration</h1></div>
+    <span class="status-pill" id="configStatus" role="status">Validating</span>
+  </header>
+
+  <main class="workspace">
+    <section class="alert alert-warning" id="setupAlert" aria-live="polite">
+      <strong id="alertTitle">Review the configuration</strong>
+      <span id="alertMessage">Complete the required fields before starting the proxy.</span>
+    </section>
+
+    <form class="config-form" id="configForm" novalidate>
+      <section class="form-section" aria-labelledby="backendTitle">
+        <div class="section-heading"><p class="eyebrow">Upstream</p><h2 id="backendTitle">Protected application</h2></div>
+        <div class="field-grid">
+          <label class="field" for="targetUrl"><span>Target URL</span><input id="targetUrl" name="targetUrl" type="url" inputmode="url" autocomplete="url" placeholder="http://192.168.1.10:80" required><small class="field-error" data-error-for="targetUrl"></small></label>
+          <label class="field" for="allowedHosts"><span>Allowed public hosts</span><input id="allowedHosts" name="allowedHosts" type="text" placeholder="app.example.com,*.service.example"><small class="field-error" data-error-for="allowedHosts"></small><small>Optional. Ports are ignored when hosts are matched.</small></label>
+        </div>
+        <div class="toggle-grid">
+          <label class="toggle-field" for="preserveHost"><input id="preserveHost" name="preserveHost" type="checkbox"><span>Preserve the public Host header upstream</span></label>
+        </div>
+      </section>
+
+      <section class="form-section" aria-labelledby="proxyTitle">
+        <div class="section-heading"><p class="eyebrow">Proxy</p><h2 id="proxyTitle">Public listener</h2></div>
+        <div class="field-grid">
+          <label class="field" for="proxyPort"><span>Listen address</span><input id="proxyPort" name="proxyPort" type="text" placeholder=":443" required><small class="field-error" data-error-for="proxyPort"></small></label>
+          <label class="field" for="trustedProxies"><span>Trusted proxies</span><input id="trustedProxies" name="trustedProxies" type="text" placeholder="127.0.0.1,::1,10.0.0.0/8"><small class="field-error" data-error-for="trustedProxies"></small></label>
+          <label class="field" for="allowedMethods"><span>Allowed HTTP methods</span><input id="allowedMethods" name="allowedMethods" type="text" required><small class="field-error" data-error-for="allowedMethods"></small></label>
+        </div>
+        <div class="toggle-grid">
+          <label class="toggle-field" for="httpMode"><input id="httpMode" name="httpMode" type="checkbox"><span>Use plaintext HTTP on the public listener</span></label>
+        </div>
+      </section>
+
+      <section class="form-section" aria-labelledby="wafTitle">
+        <div class="section-heading"><p class="eyebrow">Protection</p><h2 id="wafTitle">WAF policy</h2></div>
+        <div class="toggle-grid">
+          <label class="toggle-field" for="enableWaf"><input id="enableWaf" name="enableWaf" type="checkbox"><span>Enable request WAF</span></label>
+          <label class="toggle-field" for="enableResponseInspection"><input id="enableResponseInspection" name="enableResponseInspection" type="checkbox"><span>Inspect backend responses</span></label>
+          <label class="toggle-field" for="enableResponseXss"><input id="enableResponseXss" name="enableResponseXss" type="checkbox"><span>Inspect active scripts in responses (high false-positive risk)</span></label>
+          <label class="toggle-field" for="responseDiagnosticsErrorsOnly"><input id="responseDiagnosticsErrorsOnly" name="responseDiagnosticsErrorsOnly" type="checkbox"><span>Inspect SQL errors and stack traces only on 4xx/5xx responses</span></label>
+          <label class="toggle-field" for="hardenCookies"><input id="hardenCookies" name="hardenCookies" type="checkbox"><span>Add HttpOnly, SameSite=Lax, and Secure cookie attributes</span></label>
+        </div>
+        <div class="field-grid">
+          <label class="field" for="wafMode"><span>WAF mode</span><select id="wafMode" name="wafMode" required><option value="block">Block</option><option value="monitor">Monitor only</option><option value="off">Off</option></select><small class="field-error" data-error-for="wafMode"></small></label>
+          <label class="field" for="wafAllowlist"><span>WAF allowlist</span><input id="wafAllowlist" name="wafAllowlist" type="text" placeholder="SQLi:/api/search,XSS:/content-editor"><small class="field-error" data-error-for="wafAllowlist"></small></label>
+          <label class="field" for="contentSecurityPolicy"><span>Optional Content-Security-Policy</span><input id="contentSecurityPolicy" name="contentSecurityPolicy" type="text" placeholder="default-src 'self'; object-src 'none'"><small class="field-error" data-error-for="contentSecurityPolicy"></small></label>
+      <label class="field" for="customRulesFile"><span>Optional custom rules file</span><input id="customRulesFile" name="customRulesFile" type="text" placeholder="policy/custom-rules.json"><small class="field-error" data-error-for="customRulesFile"></small><small>Strict JSON with bounded RE2 expressions; invalid rules stop startup.</small></label>
+        </div>
+      </section>
+
+    <section class="form-section" aria-labelledby="webSocketTitle">
+    <div class="section-heading"><p class="eyebrow">Real-time traffic</p><h2 id="webSocketTitle">WebSocket protection</h2></div>
+    <div class="toggle-grid">
+      <label class="toggle-field" for="enableWebSocketProtection"><input id="enableWebSocketProtection" name="enableWebSocketProtection" type="checkbox"><span>Terminate and inspect WebSocket messages</span></label>
+      <label class="toggle-field" for="webSocketInspectBinary"><input id="webSocketInspectBinary" name="webSocketInspectBinary" type="checkbox"><span>Inspect binary messages as text (opt in only for text-based binary protocols)</span></label>
+    </div>
+    <div class="field-grid three-columns">
+      <label class="field" for="webSocketAllowedOrigins"><span>Additional allowed origins</span><input id="webSocketAllowedOrigins" name="webSocketAllowedOrigins" type="text" placeholder="https://app.example.com,*.trusted.example"><small class="field-error" data-error-for="webSocketAllowedOrigins"></small><small>Empty keeps the secure same-origin default. A global * is rejected.</small></label>
+      <label class="field" for="webSocketMaxMessageSize"><span>Maximum message bytes</span><input id="webSocketMaxMessageSize" name="webSocketMaxMessageSize" type="number" step="1024" required><small class="field-error" data-error-for="webSocketMaxMessageSize"></small></label>
+      <label class="field" for="webSocketMessagesPerSecond"><span>Messages per second, per direction</span><input id="webSocketMessagesPerSecond" name="webSocketMessagesPerSecond" type="number" step="0.1" required><small class="field-error" data-error-for="webSocketMessagesPerSecond"></small></label>
+      <label class="field" for="webSocketBurstLimit"><span>Message burst, per direction</span><input id="webSocketBurstLimit" name="webSocketBurstLimit" type="number" step="1" required><small class="field-error" data-error-for="webSocketBurstLimit"></small></label>
+    </div>
+    </section>
+
+      <section class="form-section" aria-labelledby="limitsTitle">
+        <div class="section-heading"><p class="eyebrow">Availability</p><h2 id="limitsTitle">Resource limits</h2></div>
+        <div class="toggle-grid"><label class="toggle-field" for="enableRateLimit"><input id="enableRateLimit" name="enableRateLimit" type="checkbox"><span>Enable per-IP rate limiting</span></label></div>
+        <div class="field-grid three-columns">
+          <label class="field" for="rateLimit"><span>Requests per second</span><input id="rateLimit" name="rateLimit" type="number" step="0.1" required><small class="field-error" data-error-for="rateLimit"></small></label>
+          <label class="field" for="burstLimit"><span>Burst limit</span><input id="burstLimit" name="burstLimit" type="number" step="1" required><small class="field-error" data-error-for="burstLimit"></small></label>
+          <label class="field" for="maxConns"><span>Concurrent requests per IP</span><input id="maxConns" name="maxConns" type="number" step="1" required><small class="field-error" data-error-for="maxConns"></small></label>
+          <label class="field" for="maxTrackedIps"><span>Tracked IPs</span><input id="maxTrackedIps" name="maxTrackedIps" type="number" step="1" required><small class="field-error" data-error-for="maxTrackedIps"></small></label>
+          <label class="field" for="maxConcurrentRequests"><span>Global concurrent requests</span><input id="maxConcurrentRequests" name="maxConcurrentRequests" type="number" step="1" required><small class="field-error" data-error-for="maxConcurrentRequests"></small></label>
+          <label class="field" for="maxBodySize"><span>Maximum wire body bytes</span><input id="maxBodySize" name="maxBodySize" type="number" step="1024" required><small class="field-error" data-error-for="maxBodySize"></small></label>
+          <label class="field" for="maxDecodedBodySize"><span>Maximum decoded body bytes</span><input id="maxDecodedBodySize" name="maxDecodedBodySize" type="number" step="1024" required><small class="field-error" data-error-for="maxDecodedBodySize"></small></label>
+          <label class="field" for="responseInspectionLimit"><span>Response prefix inspection bytes</span><input id="responseInspectionLimit" name="responseInspectionLimit" type="number" step="1024" required><small class="field-error" data-error-for="responseInspectionLimit"></small></label>
+          <label class="field" for="maxUrlLength"><span>Maximum request-target bytes</span><input id="maxUrlLength" name="maxUrlLength" type="number" step="1" required><small class="field-error" data-error-for="maxUrlLength"></small></label>
+          <label class="field" for="maxHeaderBytes"><span>Maximum header bytes</span><input id="maxHeaderBytes" name="maxHeaderBytes" type="number" step="1024" required><small class="field-error" data-error-for="maxHeaderBytes"></small></label>
+          <label class="field" for="maxHeaderCount"><span>Maximum header values</span><input id="maxHeaderCount" name="maxHeaderCount" type="number" step="1" required><small class="field-error" data-error-for="maxHeaderCount"></small></label>
+          <label class="field" for="rateLimitStateFile"><span>Optional rate-limit state file</span><input id="rateLimitStateFile" name="rateLimitStateFile" type="text" placeholder="state/ratelimit.json"><small class="field-error" data-error-for="rateLimitStateFile"></small></label>
+        </div>
+      </section>
+
+      <section class="form-section" aria-labelledby="trainingTitle">
+        <div class="section-heading"><p class="eyebrow">Observability</p><h2 id="trainingTitle">Training mode</h2></div>
+        <div class="toggle-grid">
+          <label class="toggle-field" for="enableTraining"><input id="enableTraining" name="enableTraining" type="checkbox"><span>Record detected attacks</span></label>
+          <label class="toggle-field" for="trainingRedactSensitive"><input id="trainingRedactSensitive" name="trainingRedactSensitive" type="checkbox"><span>Redact common credentials and session values</span></label>
+        </div>
+        <label class="field" for="trainingLogFile"><span>JSON Lines event file</span><input id="trainingLogFile" name="trainingLogFile" type="text" placeholder="logs/training.jsonl"><small class="field-error" data-error-for="trainingLogFile"></small><small>Training mode is disabled by default because payloads can contain sensitive data.</small></label>
+        <div class="training-help"><div class="training-help-text"><strong>Attack timeline report</strong><p>After collecting events, generate the self-contained HTML report:</p><code>generate_report.bat</code><code>go run ./cmd/report -open</code></div><a class="button secondary" href="../training-report.html" target="_blank" rel="noopener">Open report</a></div>
+      </section>
+
+      <section class="form-section" aria-labelledby="networkTitle">
+        <div class="section-heading"><p class="eyebrow">Network policy</p><h2 id="networkTitle">Blocklist and TLS</h2></div>
+        <label class="field" for="blockedIps"><span>Blocked IP addresses and CIDRs</span><input id="blockedIps" name="blockedIps" type="text" placeholder="192.168.1.100,10.0.0.0/8"><small class="field-error" data-error-for="blockedIps"></small></label>
+        <div class="field-grid">
+          <label class="field" for="certFile"><span>Certificate file</span><input id="certFile" name="certFile" type="text" placeholder="server.crt" required><small class="field-error" data-error-for="certFile"></small></label>
+          <label class="field" for="keyFile"><span>Private-key file</span><input id="keyFile" name="keyFile" type="text" placeholder="server.key" required><small class="field-error" data-error-for="keyFile"></small></label>
+        </div>
+        <div class="toggle-grid"><label class="toggle-field" for="insecureSkipVerify"><input id="insecureSkipVerify" name="insecureSkipVerify" type="checkbox"><span>Disable upstream TLS certificate verification (unsafe)</span></label></div>
+      </section>
+
+      <div class="form-actions"><button class="button secondary" type="button" data-action="reset">Restore defaults</button><button class="button primary" type="submit">Validate configuration</button></div>
+    </form>
+
+    <aside class="output-panel" aria-labelledby="outputTitle">
+      <div class="section-heading compact"><p class="eyebrow">Output</p><h2 id="outputTitle">Generated command</h2></div>
+      <div class="tabs" role="tablist" aria-label="Command format"><button class="tab active" type="button" role="tab" aria-selected="true" data-command-tab="powershell">PowerShell</button><button class="tab" type="button" role="tab" aria-selected="false" data-command-tab="bash">Bash</button><button class="tab" type="button" role="tab" aria-selected="false" data-command-tab="dotenv">.env</button></div>
+      <textarea id="commandOutput" class="command-output" spellcheck="false" readonly></textarea>
+      <div class="form-actions output-actions"><button class="button secondary" type="button" data-action="copy">Copy</button><button class="button secondary" type="button" data-action="download">Download .env</button></div>
+      <p class="copy-status" id="copyStatus" aria-live="polite"></p>
+    </aside>
+  </main>
+
+  <script src="scripts/config-schema.js"></script><script src="scripts/validators.js"></script><script src="scripts/formatters.js"></script><script src="scripts/storage.js"></script><script src="scripts/dom.js"></script><script src="scripts/clipboard.js"></script><script src="scripts/download.js"></script><script src="scripts/render.js"></script><script src="scripts/app.js"></script>
+</body>
+</html>
