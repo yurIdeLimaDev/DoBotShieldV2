@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title description">
+  <title id="title">DoBot Shield C4 system context</title>
+  <desc id="description">Application clients send HTTP and WebSocket traffic through a trusted edge and DoBot Shield to a protected application. A security operator configures DoBot Shield, which emits security events to monitoring.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 15px Arial, sans-serif; fill: #475569; }
+      .name { font: 700 18px Arial, sans-serif; fill: #ffffff; }
+      .type { font: 400 13px Arial, sans-serif; fill: #e2e8f0; }
+      .detail { font: 400 13px Arial, sans-serif; fill: #ffffff; }
+      .relation { font: 600 12px Arial, sans-serif; fill: #334155; }
+      .legend { font: 400 12px Arial, sans-serif; fill: #475569; }
+      .line { stroke: #334155; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1280" height="720" fill="#f8fafc"/>
+  <text x="48" y="48" class="title">DoBot Shield — C4 System Context</text>
+  <text x="48" y="76" class="subtitle">Trust boundary and primary users, systems, and traffic relationships</text>
+
+  <g transform="translate(45 270)">
+    <rect width="210" height="122" rx="8" fill="#08427b"/>
+    <text x="105" y="35" text-anchor="middle" class="name">Application Client</text>
+    <text x="105" y="58" text-anchor="middle" class="type">[Person or System]</text>
+    <text x="105" y="84" text-anchor="middle" class="detail">Uses the protected HTTP</text>
+    <text x="105" y="103" text-anchor="middle" class="detail">or WebSocket application</text>
+  </g>
+
+  <g transform="translate(315 270)">
+    <rect width="210" height="122" rx="8" fill="#64748b"/>
+    <text x="105" y="35" text-anchor="middle" class="name">Trusted Edge</text>
+    <text x="105" y="58" text-anchor="middle" class="type">[External System]</text>
+    <text x="105" y="84" text-anchor="middle" class="detail">Optional load balancer,</text>
+    <text x="105" y="103" text-anchor="middle" class="detail">ingress, or CDN</text>
+  </g>
+
+  <g transform="translate(585 250)">
+    <rect width="240" height="162" rx="8" fill="#1168bd"/>
+    <text x="120" y="40" text-anchor="middle" class="name">DoBot Shield</text>
+    <text x="120" y="64" text-anchor="middle" class="type">[Software System]</text>
+    <text x="120" y="92" text-anchor="middle" class="detail">Blocks policy violations and</text>
+    <text x="120" y="112" text-anchor="middle" class="detail">forwards approved HTTP and</text>
+    <text x="120" y="132" text-anchor="middle" class="detail">WebSocket traffic</text>
+  </g>
+
+  <g transform="translate(885 270)">
+    <rect width="250" height="122" rx="8" fill="#64748b"/>
+    <text x="125" y="35" text-anchor="middle" class="name">Protected Application</text>
+    <text x="125" y="58" text-anchor="middle" class="type">[External Software System]</text>
+    <text x="125" y="84" text-anchor="middle" class="detail">Processes traffic accepted</text>
+    <text x="125" y="103" text-anchor="middle" class="detail">by the WAF policy</text>
+  </g>
+
+  <g transform="translate(315 500)">
+    <rect width="210" height="122" rx="8" fill="#08427b"/>
+    <text x="105" y="35" text-anchor="middle" class="name">Security Operator</text>
+    <text x="105" y="58" text-anchor="middle" class="type">[Person]</text>
+    <text x="105" y="84" text-anchor="middle" class="detail">Configures policy and</text>
+    <text x="105" y="103" text-anchor="middle" class="detail">reviews detections</text>
+  </g>
+
+  <g transform="translate(885 500)">
+    <rect width="250" height="122" rx="8" fill="#64748b"/>
+    <text x="125" y="35" text-anchor="middle" class="name">Security Monitoring</text>
+    <text x="125" y="58" text-anchor="middle" class="type">[External Software System]</text>
+    <text x="125" y="84" text-anchor="middle" class="detail">Stores and correlates</text>
+    <text x="125" y="103" text-anchor="middle" class="detail">sanitized security events</text>
+  </g>
+
+  <path d="M255 331 L315 331" class="line"/>
+  <text x="285" y="319" text-anchor="middle" class="relation">HTTPS / WSS</text>
+  <path d="M525 331 L585 331" class="line"/>
+  <text x="555" y="319" text-anchor="middle" class="relation">Routes traffic</text>
+  <path d="M825 331 L885 331" class="line"/>
+  <text x="855" y="319" text-anchor="middle" class="relation">Approved traffic</text>
+  <path d="M525 545 C575 515, 610 455, 650 412" class="line"/>
+  <text x="565" y="498" class="relation">Configures policy</text>
+  <path d="M760 412 C810 460, 850 510, 885 545" class="line"/>
+  <text x="800" y="493" class="relation">Emits events</text>
+
+  <g transform="translate(48 666)">
+    <rect width="18" height="18" rx="3" fill="#1168bd"/>
+    <text x="26" y="14" class="legend">System in scope</text>
+    <rect x="150" width="18" height="18" rx="3" fill="#08427b"/>
+    <text x="176" y="14" class="legend">Person or client</text>
+    <rect x="310" width="18" height="18" rx="3" fill="#64748b"/>
+    <text x="336" y="14" class="legend">External system</text>
+  </g>
+</svg>

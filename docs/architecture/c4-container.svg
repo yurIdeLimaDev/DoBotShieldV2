@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="860" viewBox="0 0 1440 860" role="img" aria-labelledby="title description">
+  <title id="title">DoBot Shield C4 container view</title>
+  <desc id="description">The Go WAF proxy receives client traffic and forwards approved traffic to the protected application. An operator uses a static configuration UI and custom rules. Optional training events are processed by a Go report generator.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 15px Arial, sans-serif; fill: #475569; }
+      .boundary { font: 700 17px Arial, sans-serif; fill: #1168bd; }
+      .name { font: 700 17px Arial, sans-serif; fill: #ffffff; }
+      .type { font: 400 12px Arial, sans-serif; fill: #e2e8f0; }
+      .detail { font: 400 12px Arial, sans-serif; fill: #ffffff; }
+      .relation { font: 600 11px Arial, sans-serif; fill: #334155; }
+      .line { stroke: #334155; stroke-width: 2.1; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 7 5; }
+    </style>
+  </defs>
+
+  <rect width="1440" height="860" fill="#f8fafc"/>
+  <text x="44" y="46" class="title">DoBot Shield — C4 Container View</text>
+  <text x="44" y="74" class="subtitle">Deployable runtime, operator tooling, policy input, and optional reporting flow</text>
+
+  <rect x="220" y="100" width="990" height="700" rx="12" fill="#eff6ff" stroke="#1168bd" stroke-width="2" stroke-dasharray="9 6"/>
+  <text x="244" y="132" class="boundary">DoBot Shield [Software System]</text>
+
+  <g transform="translate(20 300)">
+    <rect width="160" height="120" rx="8" fill="#08427b"/>
+    <text x="80" y="34" text-anchor="middle" class="name">Client</text>
+    <text x="80" y="57" text-anchor="middle" class="type">[Person or System]</text>
+    <text x="80" y="83" text-anchor="middle" class="detail">Sends HTTP or</text>
+    <text x="80" y="102" text-anchor="middle" class="detail">WebSocket traffic</text>
+  </g>
+
+  <g transform="translate(1260 300)">
+    <rect width="160" height="120" rx="8" fill="#64748b"/>
+    <text x="80" y="34" text-anchor="middle" class="name">Application</text>
+    <text x="80" y="57" text-anchor="middle" class="type">[External System]</text>
+    <text x="80" y="83" text-anchor="middle" class="detail">Receives approved</text>
+    <text x="80" y="102" text-anchor="middle" class="detail">traffic</text>
+  </g>
+
+  <g transform="translate(20 610)">
+    <rect width="160" height="120" rx="8" fill="#08427b"/>
+    <text x="80" y="34" text-anchor="middle" class="name">Operator</text>
+    <text x="80" y="57" text-anchor="middle" class="type">[Person]</text>
+    <text x="80" y="83" text-anchor="middle" class="detail">Tunes policy and</text>
+    <text x="80" y="102" text-anchor="middle" class="detail">reviews reports</text>
+  </g>
+
+  <g transform="translate(300 250)">
+    <rect width="520" height="220" rx="9" fill="#1168bd"/>
+    <text x="260" y="38" text-anchor="middle" class="name">WAF Reverse Proxy</text>
+    <text x="260" y="62" text-anchor="middle" class="type">[Container: Go executable]</text>
+    <text x="260" y="94" text-anchor="middle" class="detail">TLS/HTTP listener and protocol validation</text>
+    <text x="260" y="120" text-anchor="middle" class="detail">Global, per-IP, host, method, and body admission</text>
+    <text x="260" y="146" text-anchor="middle" class="detail">Request and bounded response WAF inspection</text>
+    <text x="260" y="172" text-anchor="middle" class="detail">Bidirectional WebSocket message protection</text>
+    <text x="260" y="198" text-anchor="middle" class="detail">Defensive forwarding and response headers</text>
+  </g>
+
+  <g transform="translate(900 150)">
+    <rect width="260" height="125" rx="9" fill="#438dd5"/>
+    <text x="130" y="34" text-anchor="middle" class="name">Training Event Log</text>
+    <text x="130" y="58" text-anchor="middle" class="type">[Data Container: JSON Lines]</text>
+    <text x="130" y="86" text-anchor="middle" class="detail">Optional sanitized events;</text>
+    <text x="130" y="107" text-anchor="middle" class="detail">disabled by default</text>
+  </g>
+
+  <g transform="translate(260 590)">
+    <rect width="280" height="130" rx="9" fill="#438dd5"/>
+    <text x="140" y="34" text-anchor="middle" class="name">Static Configuration UI</text>
+    <text x="140" y="58" text-anchor="middle" class="type">[Container: HTML, CSS, JavaScript]</text>
+    <text x="140" y="87" text-anchor="middle" class="detail">Validates settings locally and</text>
+    <text x="140" y="108" text-anchor="middle" class="detail">generates environment configuration</text>
+  </g>
+
+  <g transform="translate(600 590)">
+    <rect width="280" height="130" rx="9" fill="#438dd5"/>
+    <text x="140" y="34" text-anchor="middle" class="name">Custom Rule Policy</text>
+    <text x="140" y="58" text-anchor="middle" class="type">[Data Container: versioned JSON]</text>
+    <text x="140" y="87" text-anchor="middle" class="detail">Optional bounded RE2 rules for</text>
+    <text x="140" y="108" text-anchor="middle" class="detail">HTTP and WebSocket inspection</text>
+  </g>
+
+  <g transform="translate(940 590)">
+    <rect width="220" height="110" rx="9" fill="#1168bd"/>
+    <text x="110" y="34" text-anchor="middle" class="name">Report Generator</text>
+    <text x="110" y="58" text-anchor="middle" class="type">[Container: Go command]</text>
+    <text x="110" y="84" text-anchor="middle" class="detail">Creates an HTML report</text>
+  </g>
+
+  <path d="M180 360 L300 360" class="line"/>
+  <text x="240" y="347" text-anchor="middle" class="relation">HTTPS / WSS</text>
+  <path d="M820 360 L1260 360" class="line"/>
+  <text x="1040" y="347" text-anchor="middle" class="relation">Approved HTTP(S) / WS(S)</text>
+  <path d="M180 670 L260 655" class="line dash"/>
+  <text x="216" y="650" text-anchor="middle" class="relation">Uses</text>
+  <path d="M400 590 L465 470" class="line dash"/>
+  <text x="394" y="530" text-anchor="end" class="relation">Generates settings for</text>
+  <path d="M740 590 L670 470" class="line dash"/>
+  <text x="720" y="530" class="relation">Loaded at startup</text>
+  <path d="M820 290 L900 240" class="line dash"/>
+  <text x="847" y="247" text-anchor="middle" class="relation">Writes events</text>
+  <path d="M1030 275 C1170 360, 1175 500, 1050 590" class="line"/>
+  <text x="1168" y="445" text-anchor="middle" class="relation">Reads</text>
+  <path d="M940 650 C760 790, 330 820, 180 700" class="line"/>
+  <text x="570" y="786" text-anchor="middle" class="relation">Produces a report for</text>
+</svg>
