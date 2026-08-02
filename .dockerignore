@@ -1,4 +1,5 @@
 .git
+.github
 .gitignore
 .gocache
 *.crt
@@ -10,9 +11,12 @@
 admin-config
 certificate
 cmd
+docs
 report
+testes-de-falsos-positivos
 logs
 state
 README.md
 TRAINING_MODE.md
 CUSTOM_RULES.md
+docker-compose.yml

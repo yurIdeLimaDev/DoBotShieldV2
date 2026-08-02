@@ -31,7 +31,7 @@ func initXSSPatterns() []*regexp.Regexp {
 		regexp.MustCompile(`(?i)<\s*script`),
 		regexp.MustCompile(`(?i)javascript\s*:`),
 		regexp.MustCompile(`(?i)<\s*/?\s*(iframe|object|embed|svg|math)\b`),
-		regexp.MustCompile(`(?i)on\w+\s*=\s*`),
+		regexp.MustCompile(`(?i)<[^>\r\n]{0,256}(?:\s|/)on[a-z][a-z0-9_-]{1,40}\s*=\s*`),
 		regexp.MustCompile(`(?i)alert\s*\(`),
 		regexp.MustCompile(`(?i)vbscript\s*:`),
 		regexp.MustCompile(`(?i)expression\s*\(`),

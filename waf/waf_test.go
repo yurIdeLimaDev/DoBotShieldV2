@@ -22,6 +22,18 @@ func TestCheckRequestDetectsEncodedXSS(t *testing.T) {
 	}
 }
 
+func TestCheckRequestDetectsHTMLEventHandlerAttribute(t *testing.T) {
+	r := httptest.NewRequest("GET", "/render?html=%3Cimg%20src%3Dx%20onerror%3Dfetch%28%27%2Fprivate%27%29%3E", nil)
+
+	malicious, details, _ := CheckRequest(r, nil)
+	if !malicious {
+		t.Fatalf("expected an HTML event-handler attribute to be blocked")
+	}
+	if !strings.Contains(details, "XSS") {
+		t.Fatalf("expected XSS details, got %q", details)
+	}
+}
+
 func TestCheckRequestDetectsSQLCommentEvasion(t *testing.T) {
 	r := httptest.NewRequest("GET", "/items?id=1+UN/**/ION+SEL/**/ECT+password+FROM+users", nil)
 

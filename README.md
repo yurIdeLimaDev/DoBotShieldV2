@@ -1,6 +1,10 @@
+DoBot Shield blocks malicious HTTP and WebSocket traffic before it reaches an application and forwards traffic that passes its configured policy.
+
+[![Go 1.26.5](https://img.shields.io/badge/Go-1.26.5-00ADD8?logo=go&logoColor=white)](https://go.dev/) [![Security verification](https://img.shields.io/github/actions/workflow/status/yurIdeLimaDev/DoBotWAF/security.yml?branch=main&label=security%20checks)](https://github.com/yurIdeLimaDev/DoBotWAF/actions/workflows/security.yml) [![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#deployment-with-docker-compose) [![HTTP and WebSocket](https://img.shields.io/badge/protection-HTTP%20%2B%20WebSocket-1168BD)](#websocket-protection)
+
 # DoBot Shield
 
-DoBot Shield is a defensive reverse-proxy Web Application Firewall (WAF) written in Go. It sits in front of an HTTP or HTTPS application, applies protocol, traffic, request, and response controls, and forwards requests that satisfy the configured policy.
+DoBot Shield is a defensive reverse-proxy Web Application Firewall (WAF) written in Go. It enforces bounded protocol, traffic, request, response, and WebSocket controls before forwarding approved traffic to one configured HTTP or HTTPS backend.
 
 The project is intentionally small and self-contained. Its static configuration page is available at [`admin-config/index.html`](admin-config/index.html), and its optional Training Mode produces a self-contained HTML security-event report.
 
@@ -28,62 +32,73 @@ The request engine normalizes URL encoding, HTML entities, JavaScript-style esca
 
 Response inspection recognizes database-error disclosures, stack traces, file disclosures, and optionally active XSS patterns. Inspection is bounded to a prefix; if a larger response has no match in that prefix, the remainder is streamed without inspection and the partial-inspection event is logged.
 
-## Quick start
+## Architecture
+
+The diagrams use the C4 model: the first shows DoBot Shield in its operating environment, and the second shows the deployable containers and principal runtime responsibilities.
+
+### C4 system context
+
+![C4 system context for DoBot Shield](docs/architecture/c4-system-context.svg)
+
+### C4 container view
+
+![C4 container view for DoBot Shield](docs/architecture/c4-container.svg)
+
+HTTP requests and WebSocket handshakes pass through the same admission and request-inspection controls. HTTP responses receive bounded response inspection. WebSocket connections are terminated and re-originated so complete messages can be inspected before either direction is forwarded.
+
+## Deployment with Docker Compose
+
+Requirements: Docker Engine with Docker Compose v2 and an HTTP or HTTPS backend that the container can reach.
+
+1. Create the local deployment configuration:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   PowerShell equivalent:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+2. Edit `.env`. `TARGET_URL` must point to the protected backend, not to DoBot Shield itself. The supplied value expects a backend listening on port `4280` of the Docker host.
+
+3. Build and start the WAF:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. Confirm that the container is running and inspect startup errors:
+
+   ```bash
+   docker compose ps
+   docker compose logs --tail=100 waf
+   ```
+
+5. Send client traffic to `http://127.0.0.1:8080` instead of directly to the backend. For example:
+
+   ```bash
+   curl --include http://127.0.0.1:8080/
+   ```
+
+To rebuild after an update, run `docker compose up --build -d` again. To stop and remove the deployment, run `docker compose down`.
+
+The Compose service runs as the unprivileged image user with a read-only root filesystem, all Linux capabilities dropped, and `no-new-privileges` enabled. It terminates plain HTTP on port `8080` so a trusted ingress, load balancer, or CDN can terminate public TLS. Prevent clients from reaching the backend directly. If a trusted proxy is in front of DoBot Shield, set `TRUSTED_PROXIES` only to that proxy's addresses.
+
+For a backend in the same Compose project, set `TARGET_URL` to its service name, such as `http://api:4280`. For a remote HTTPS backend, use its absolute `https://` URL and keep certificate verification enabled.
+
+### Native development run
 
 Requirements: Go 1.25 or newer. The module selects the patched Go 1.26.5 toolchain when Go toolchain auto-selection is available.
 
-1. Build the proxy:
-
-   ```bash
-   go build -trimpath -o dobotshield .
-   ```
-
-2. For a local HTTP deployment, set the backend and listener:
-
-   PowerShell:
-
-   ```powershell
-   $env:TARGET_URL = "http://127.0.0.1:4280"
-   $env:HTTP_MODE = "true"
-   $env:PROXY_PORT = "127.0.0.1:8080"
-   .\dobotshield.exe
-   ```
-
-   Bash:
-
-   ```bash
-   TARGET_URL=http://127.0.0.1:4280 \
-   HTTP_MODE=true \
-   PROXY_PORT=127.0.0.1:8080 \
-   ./dobotshield
-   ```
-
-3. Send client traffic to `http://127.0.0.1:8080` instead of directly to the backend.
-
-For production, prevent clients from bypassing the proxy at the network layer. If a load balancer or CDN is in front of DoBot Shield, list only its address ranges in `TRUSTED_PROXIES` so forwarded client identity and scheme are accepted only from trusted peers.
-
-### HTTPS frontend
-
-Production deployments should use a certificate issued for the public hostname. Configure `CERT_FILE` and `KEY_FILE`, leave `HTTP_MODE=false`, and bind `PROXY_PORT` to the desired listener.
-
-For an isolated local test, the helper creates a self-signed ECDSA certificate for localhost in the current directory:
-
 ```bash
-go run ./certificate
+go build -trimpath -o dobotshield .
+TARGET_URL=http://127.0.0.1:4280 HTTP_MODE=true PROXY_PORT=127.0.0.1:8080 ./dobotshield
 ```
 
-The generated private key is written with restrictive permissions. A self-signed certificate is not appropriate for public production traffic.
-
-### Docker
-
-```bash
-docker build -t dobotshield .
-docker run --rm -p 8080:8080 \
-  -e TARGET_URL=http://host.docker.internal:4280 \
-  dobotshield
-```
-
-The runtime image uses an unprivileged user, exposes port 8080, and defaults to HTTP inside the container so TLS can terminate at a trusted ingress. Pin and periodically refresh the base images as part of normal supply-chain maintenance.
+For an isolated local HTTPS test, `go run ./certificate` creates a self-signed ECDSA certificate for localhost. Never use that certificate or key for a public deployment.
 
 ## WAF modes and tuning
 
@@ -157,24 +172,6 @@ All configuration is supplied through environment variables. Empty or invalid po
 
 The static Admin UI validates these values and generates PowerShell, Bash, or `.env` output locally in the browser. It does not send data, change the host configuration, or start the service.
 
-## Request flow
-
-```text
-client request
-  -> request ID and global capacity
-  -> HTTP protocol and metadata validation
-  -> allowed host, blocklist, method, and per-IP admission
-  -> bounded encoded-body read and bounded content decoding
-  -> normalized and structured WAF inspection
-  -> HTTP reverse proxy, or terminating WebSocket message proxy
-  -> defensive response headers and bounded response inspection
-  -> client response
-```
-
-WebSocket upgrades receive the same admission and handshake inspection, explicit origin authorization, a bounded upstream handshake, message-size and per-direction rate limits, and bidirectional WAF/custom-rule inspection. Compression is intentionally not negotiated. HTTP/2 extended CONNECT WebSockets are not implemented; RFC 6455 over HTTP/1.1 is supported.
-
-Local error responses are JSON with generic client-facing reasons, `Cache-Control: no-store`, an `X-Request-ID`, and defensive headers. Detailed detections remain in sanitized server logs.
-
 ## Training Mode and reports
 
 Training Mode is an optional observability feature. It records the decision, rule, bounded original value, normalized variants, request ID, source, route, and phase as JSON Lines. Keep these records access-controlled because security payloads and application context can be sensitive.
@@ -191,10 +188,13 @@ On Windows, `generate_report.bat` runs the same generator and opens the result. 
 
 ```bash
 go test ./...
+go test ./testes-de-falsos-positivos
 go vet ./...
 go build -trimpath ./...
 go test -race ./...
 ```
+
+The dedicated false-positive regression suite sends both malicious and legitimate HTTP requests through the complete secure-handler path. Malicious cases must receive a WAF block, while legitimate cases must reach the test backend. The tests are implemented entirely in Go and live in [`testes-de-falsos-positivos/`](testes-de-falsos-positivos/).
 
 The `Continuous security verification` GitHub Actions workflow runs unit tests, vet, static analysis, vulnerability analysis, the Go data-race detector, four bounded fuzz targets, and a high-confidence differential corpus against the official OWASP CRS 4.25 LTS container. The CRS test is intentionally a comparison baseline, not a claim of full CRS compatibility.
 
@@ -208,13 +208,16 @@ blocklist/       IP and CIDR deny policy
 certificate/     local self-signed certificate helper
 cmd/report/      Training Mode report command
 config/          environment parsing and configuration validation
+docs/            C4 architecture diagrams
 middleware/      admission policy, reverse proxy, headers, and orchestration
 ratelimit/       bounded per-IP token buckets and optional state persistence
 report/          self-contained HTML report generator
+testes-de-falsos-positivos/  malicious and legitimate request regressions
 traininglog/     failure-tolerant, permission-restricted JSON Lines logging
 utils/           request IDs, client identity, and safe access logging
 waf/             protocol, body, structured-data, semantic, and pattern rules
 .github/         continuous race, fuzz, vulnerability, and CRS verification
+docker-compose.yml  hardened local Compose deployment
 ```
 
 ## Standards and limitations
