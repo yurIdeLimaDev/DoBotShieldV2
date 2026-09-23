@@ -1,6 +1,6 @@
 DoBot Shield blocks malicious HTTP and WebSocket traffic before it reaches an application and forwards traffic that passes its configured policy.
 
-[![Go 1.26.5](https://img.shields.io/badge/Go-1.26.5-00ADD8?logo=go&logoColor=white)](https://go.dev/) [![Security verification](https://img.shields.io/github/actions/workflow/status/yurIdeLimaDev/DoBotWAF/security.yml?branch=main&label=security%20checks)](https://github.com/yurIdeLimaDev/DoBotWAF/actions/workflows/security.yml) [![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#deployment-with-docker-compose) [![HTTP and WebSocket](https://img.shields.io/badge/protection-HTTP%20%2B%20WebSocket-1168BD)](#websocket-protection)
+[![Go 1.26.5](https://img.shields.io/badge/Go-1.26.5-00ADD8?logo=go&logoColor=white)](https://go.dev/) [![Security verification](https://img.shields.io/github/actions/workflow/status/yurIdeLimaDev/DoBotShieldV2/security.yml?branch=main&label=security%20checks)](https://github.com/yurIdeLimaDev/DoBotShieldV2/actions/workflows/security.yml) [![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#deployment-with-docker-compose) [![HTTP and WebSocket](https://img.shields.io/badge/protection-HTTP%20%2B%20WebSocket-1168BD)](#websocket-protection)
 
 # DoBot Shield
 
